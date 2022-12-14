@@ -44,7 +44,7 @@ There are 7 Options comes with -k argument wich are [ssrf,redirect,xss,idoor,isq
 
 Analyze the list and try to find xss pramters , you can use -w argument to add your word
 ```
-./paramjection.sh -k xss -c hello
+./paramjection.sh -k xss -w hello
 ```
 
 Analyze the list and try to find lfi pramters , you can use -p argument to add your payloads list
