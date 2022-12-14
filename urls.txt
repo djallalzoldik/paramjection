@@ -1,0 +1,17 @@
+https://example.com?id=akira&s=we
+https://example.com?idor=akira&s=we 
+https://example.com?idor=akira&idm=we
+https://example.com?url=akira&id=smith
+https://example.com?cmd=akira
+https://example.com?red=akira&ok=smith
+https://example.com?ok=hello
+https://example.com?rce=shit
+https://example.com?name=s&rce1=kio
+https://example.com?lfi=here
+https://example.com?id=jfld&lfi1=here
+https://example.com?name=dfd&sql=here
+https://example.com?sql1=here
+https://example.com?xss=fdsa&id=54
+https://example.com?xss1=fdasfas
+https://example.com?red=56
+https://example.com?r=fdas&red2=fdasf
