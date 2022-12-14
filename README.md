@@ -54,7 +54,7 @@ Analyze the list and try to find lfi pramters , you can use -p argument to add y
 If you have list and try to find all the kinds [ssrf rce xss ...etc ,] type this command
 
 ```
-./paramjection.sh -k all -c xxxxxxxxxxxxxxxxxxxxxxxxxxx.oast.site
+./paramjection.sh -k all -c xxxxxxxxxxxxxxxxxxxxxxxxxxx.oast.site -w hello
 
 ```
 ## Second way :
