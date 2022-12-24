@@ -176,6 +176,7 @@ if [ ! -z $prm ]; then
 				#try to find the param wich mentioned by user
 		   		if [[ " ${myArray[$t]} "  == *"$prm="* ]]; then
 		   				pa="$prm"
+						eparam="$can"
 						if [[ $ans = "y" ]]; then
 							.encodeparam "$can"
 						fi
