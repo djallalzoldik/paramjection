@@ -59,14 +59,14 @@ Help()
    		      or xxxxxxxxxxxxxxxxxxxxxxxxxxx.oast.site 
 		      you can use it in (ssrf,redirect) 
 			  "
-   echo "   -w [Canary]   Choose your own word you can use it in (xss, idor of -f find file)"
+   echo "   -w [Canary]   Choose your own word you can use it in (xss, idor or -f [paramater] )"
    echo "   -l [List]     Choose your urls list"
    echo "   -p [payload path list]    Choose your payload list you can use it in (rce,isql,lfi)"
    echo "   -o [output_name]   "
-   echo "   -f [paramater] | -f all ]   You can find special param , NOTICE if you use -f all that will replace all the paramater to your word you provid with -w argument"
+   echo "   -f [paramater] | -f all ]   You can find specific param , NOTICE if you use -f 'all' that will replace all the paramater to your word you provid with -w argument"
    echo "   -v     use verbose"
-   echo "   -e    encode the paramaters"
-   echo "   -d    decode the paramaters"
+   echo "   -e    URL_encode the paramaters"
+   echo "   -d    URL_decode the paramaters"
    echo "   --bE    base64-encode the paramaters"
    echo "   --bD    base64-decode the paramaters"
    echo "   -h     Print this Help."
