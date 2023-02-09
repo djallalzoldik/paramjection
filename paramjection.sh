@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash 
 
 #color
 red=`tput setaf 1`
@@ -50,25 +50,24 @@ Help()
    echo "Usage: 
    paramjection [flags]"
    
-   echo "   -k [idor | xss | idor | rce | redirect | lfi | isql | all ...etc]    Kind which target params you want for example 
+   echo "   -k idor,xss,all...etc    Kind which target params you want for example 
               if you want to inject in ssrf params use -k ssrf ,
-              if you want to target all the params (xss,ssrf,idor...) use -k all  
-			  "
+              if you want to target all the params (xss,ssrf,idor...) use -k all  "
    
-   echo "   -c [collaborator]    Use your collaborator like https://webhook.com,
-   		      or xxxxxxxxxxxxxxxxxxxxxxxxxxx.oast.site 
-		      you can use it in (ssrf,redirect) 
-			  "
-   echo "   -w [Canary]   Choose your own word you can use it in (xss, idor or -f [paramater] )"
-   echo "   -l [List]     Choose your urls list"
-   echo "   -p [payload path list]    Choose your payload list you can use it in (rce,isql,lfi)"
-   echo "   -o [output_name]   "
-   echo "   -f [paramater] | -f all ]   You can find specific param , NOTICE if you use -f 'all' that will replace all the paramater to your word you provid with -w argument"
+   echo "   -c collaborator    Use your collaborator like https://webhook.com,
+   		      or cebj2b08d3i9vaasv290gj4jaeb446m59.oast.site 
+		      you can use it in (ssrf,redirect) "
+   echo "   -w Canary   Choose your own word you can use it in (xss, idor of -f find file)"
+   echo "   -l List     Choose your urls list"
+   echo "   -p payload list    Choose your payload list you can use it in (rce,isql,lfi)"
+   echo "   -o output   "
+   echo "   -f You can find special param "
    echo "   -v     use verbose"
-   echo "   -e    URL_encode the paramaters"
-   echo "   -d    URL_decode the paramaters"
-   echo "   --bE    base64-encode the paramaters"
-   echo "   --bD    base64-decode the paramaters"
+   echo "   -e    encode the paramaters"
+   echo "   -d    decode the paramaters"
+   echo "   -d    decode the paramaters"
+   echo "   --bE  encodebase64"
+   echo "   --bD  decodebase64"
    echo "   -h     Print this Help."
 }
 
@@ -87,9 +86,14 @@ decodeurl() {
 
 }
 
-base64func() {
+encodebase64func() {
 	ans="y"
 	en="b"
+}
+
+decodebase64func() {
+	ans="y"
+	en="bd"
 }
 
 verbose() {
@@ -99,29 +103,32 @@ verbose() {
 ##
 
 
+
 # loop on the arguments
-	while getopts k:c:f:w:l:o:p:ehvdb flag
+	while [ $# -gt 0 ] ; 
 	do	
-    	case "${flag}" in
-		
-        	k) file="${OPTARG}";;
-        	c) colab="${OPTARG}";;
-        	w) can="${OPTARG}";;
-        	l) list="${OPTARG}";;
-			o) output="${OPTARG}";;
-			p) payload="${OPTARG}";;
-			f) prm="${OPTARG}";;
-			v) verbose ;;
-			e) Encodeurl ;;
-			d) decodeurl ;;
-			b) base64func ;;
-			h) Help
-			   exit;;
-			\?) 
-         		echo "Error: Invalid option"
-         		exit;;
+    	case "$1" in
+
+        	-k) file="$2";;
+        	-c) colab="$2";;
+        	-w) can="$2";;
+        	-l) list="$2";;
+			-o) output="$2";;
+			-p) payload="$2";;
+			-f) prm="$2";;
+			-v) verbose ;;
+			-e) Encodeurl ;;
+			-d) decodeurl ;;
+			--bE) encodebase64func;;
+			--bD) decodebase64func;;
+			-h) Help
+			    exit;;
+			 \?) 
+         		 echo "Error: Invalid option"
+         		 exit;;
         
     	esac
+		shift
 		
 	done
 
@@ -153,14 +160,20 @@ verbose() {
 				function .encodeparam() {
 							
 							if [[ $ans = "y" ]]; then
+									if [[ "$equalmultipe" == "true" ]]; then
+										eqa="$1=="
+									fi
 
 									if [[ $en = "y" ]]; then 
 										eparam=(`urlencode  "$1"`)
 									elif [[ $en = "d" ]]; then
 										eparam=(`urldecode  "$1"`)
-
+										eparam=(`echo "$eparam" | sed 's;/;\\\/;g'`)
 									elif [[ $en = "b" ]]; then
 									   eparam=(`echo "$1" | base64`)
+									elif [[ $en = "bd" ]] && [[ "$eqa" =~ ^([A-Za-z0-9+/]{4})*([A-Za-z0-9+/]{3}=|[A-Za-z0-9+/]{2}==)?$ ]] ; then
+									   eparam=(`echo "$1" | base64 --decode --ignore-garbage`)
+									   eparam=(`echo "$eparam" | sed 's;/;\\\/;g'`)									
 									fi											
 							fi 
 				}
@@ -169,13 +182,25 @@ verbose() {
 #function for temprory files in db/ looping on urlslist and filtering and put it in temprory file in db/file-result.txt
 			function .db() {
 
+
 				#if [ "$stand" == "on" ]; then
-					
-					echo "$1" | sed "s/$pa=[^&]*/$pa=$eparam/g" >> ~/"paramjection/db/""$2""-result.txt"
-					if [ -t 1 ]; then
-						echo "[ $white $file $green$reset ]$1" | sed "s/$pa=[^&]*/$pa=$bg_magenta$eparam$reset/g"
-					else	
-						printf '%s\n' "$1" | sed "s/$pa=[^&]*/$pa=$eparam/g" #>> "db/""$2""-result.txt"
+					if [ -z "$3" ]; then
+
+						echo "$1" | sed "s/$pa=[^&]*/$pa=$eparam/g" >> ~/"paramjection/db/""$2""-result.txt"
+						if [ -t 1 ]; then
+							echo "[ $white $file $green$reset ]$1" | sed "s/$pa=[^&]*/$pa=$bg_magenta$eparam$reset/g"
+						else	
+							echo "$1" | sed "s/$pa=[^&]*/$pa=$eparam/g" #>> "db/""$2""-result.txt"
+						fi
+
+
+					else
+						echo "$1" | sed "s/$pa=[^&]*/$pa=$eparam/g" >> ~/"paramjection/db/""$2""-result.txt"
+						if [ -t 1 ]; then
+							echo "[ $white $file $green$reset ]$1" | sed "s/$pa=[^&]*/$pa=$bg_magenta$eparam$reset/g"
+						else	
+							echo "$1" | sed "s/$pa=[^&]*/$pa=$eparam/g" #>> "db/""$2""-result.txt"
+						fi
 					fi
 
 			}
@@ -209,21 +234,70 @@ if [ ! -z $prm ]; then
 
 				
 	#looping in the list or looping on standard input
+
+	       
+
+				
   
 		findfunction() {
+				while [[ $prm = "all" ]]; do
+										
+										prm=""										
+										if [[ $en = "bd" ]] || [[ $en = "d" ]]; then
+											if [[ "$line"  =~ "=="{1,} ]]; then
+												equalmultipe="true"
+											fi
+											line=(` echo $line | sed 's/==\{1,\}//g' `)	
+										fi
+						
+									done
 				#try to find the param wich mentioned by user
 		   		if [[ "$line"  == *"$prm="* ]]; then
 		   				pa="$prm"
-						if [[ $ans = "y" ]]; then
-							.encodeparam "$can"
+						cond="&"
+						value=(`echo "$line" | sed "s/$pa=[^&]*/$cond/g" | sed "s/.*$pa=//g" | sed "s/&.*//g"`)
+						if [ -z "$can" ]; then 
+																				
+									#cond="&"
+									#value=(`echo "$line" | sed "s/'$pa'=[^&]*/'$cond'/g" | sed "s/.*'$pa'=//g" | sed "s/&.*//g"`)
+
+									if [[ $ans = "y" ]]; then
+										if [[ $en = "bd" ]] || [[ $en = "d" ]]; then
+												echo $value
+													.encodeparam "$value"
+											else 
+
+													.encodeparam "$can"
+										fi
+									  	
+										
+									else
+										eparam=(`echo "$value" | sed 's;/;\\\/;g'`)
+
+									fi
+									
+
+									
 						else
-							eparam=(`echo "$can" | sed 's;/;\\\/;g'`)
+							if [[ $ans = "y" ]]; then
+
+								.encodeparam "$can"
+							else
+
+								eparam=(`echo "$can" | sed 's;/;\\\/;g'`)
+							fi
+							
 						fi
 						file="$prm"
 						if [ ! -z $output ]; then
 							file=$output
+						else 
+							file="all_params_injected"
+
 						fi
-						.db $line $file
+							 
+							.db $line $file $can
+						
 						
 						
 		   		fi
@@ -231,7 +305,15 @@ if [ ! -z $prm ]; then
 			}
 								files=${list--} # POSIX-compliant; ${1:--} can be used either.
 								while IFS= read -r line; do
+								 echo $line
+								
+						
+								
+								  
 								  findfunction
+								  prm="all" 
+
+								  
 								  
 								done < <(cat -- "$files")
 
@@ -291,6 +373,8 @@ elif [ -z $prm ]; then
 
     												pa="${arr2[$b]}"
 													if [[ "$line"  == *"$pa="* ]]; then
+													    cond="&"
+														value=(`echo "$line" | sed "s/$pa=[^&]*/$cond/g" | sed "s/.*$pa=//g" | sed "s/&.*//g"`)														
 													
 															if [ "$v" = "true" ]; then
 																echo "$green FOUND[$pa] $reset"
@@ -305,44 +389,73 @@ elif [ -z $prm ]; then
 
 																			f=$file
        									            						if [ -z "$colab" ]; then 
-																				eparam="collaborator"
+																				
+																				# cond="&"
+																				# value=(`echo "$line" | sed "s/$pa=[^&]*/$cond/g" | sed "s/.*$pa=//g" | sed "s/&.*//g"`)
+																				if [[ $ans = "y" ]]; then
+																	    		  	if [[ $en = "bd" ]] || [[ $en = "d" ]]; then
+																	      					.encodeparam $value
+																					else 
+																							.encodeparam $colab
+																					fi
+																					
+																				else
+																					eparam=(`echo "$colab" | sed 's;/;\\\/;g'`)
 
-       									                		 				.db "$line" "$f"													    		 				
+																				fi																				
+
+       									                		 				.db "$line" "$f" "$colab"													    		 				
 
        									            						elif [[ ! -z $colab ]]; then
 
 													    		 				if [[ $ans = "y" ]]; then
-																	    		  	.encodeparam "$colab"
+																	    		  	if [[ $en = "bd" ]] || [[ $en = "d" ]]; then
+																	      					.encodeparam $value
+																					else 
+																							.encodeparam $colab
+																					fi
 																				else
 																					eparam=(`echo "$colab" | sed 's;/;\\\/;g'`)
 
 																				fi
-																				.db "$line" "$f"
+																				.db "$line" "$f" "$colab"
     						    		            						fi
 
 																	#idor and xss config || this will check if -k eqaul to xss or idor
 																	elif [[ $file = ${arrfiles[1]} ]] || [[ $file = ${arrfiles[5]} ]]; then															
 																			
        									                		    		f=$file
-       									            						if [ -z "$can" ]; then 
-																				   
+       									            						if [ -z "$can" ]; then 	
 																				
+																				if [[ $ans = "y" ]]; then
+																	    		  	if [[ $en = "bd" ]] || [[ $en = "d" ]]; then
+																	      					.encodeparam $value
+																					else 
+																							.encodeparam $can
+																					fi
+																					
+																				else
+																					eparam=(`echo "$can" | sed 's;/;\\\/;g'`)
 
-       									                		 				.db "$line" "$f"
+																				fi	
+       									                		 				.db "$line" "$f" "$can"
 
        									            						elif [[ ! -z $can ]]; then
 																			
 																				eparam="$can"
-													    		 				if [[ $ans = "y" ]]; then
-																					
-																	      			.encodeparam "$can"
+													    		 				if [[ $ans = "y" ]]; then																													      			
+																					if [[ $en = "bd" ]] || [[ $en = "d" ]]; then
+																	      					.encodeparam $value
+																					else 
+																							.encodeparam $can
+																					fi
 																				else
 																					
 																					eparam=(`echo "$can" | sed 's;/;\\\/;g'`)
 																				fi
 																					
 																					
-																				.db "$line" "$f"
+																				.db "$line" "$f" "$can"
     						    		            						fi 
 
 																	#config isql and lfi and rce || this will check if -k equal to isql or lfi or rce
@@ -361,12 +474,16 @@ elif [ -z $prm ]; then
                     	        		                		                        		inject="${arr3[$n]}"
 																									eparam="$inject"
 													    		 		                			if [[ $ans = "y" ]]; then
-																	      								.encodeparam "$inject"
-
+																										if [[ $en = "bd" ]] || [[ $en = "d" ]]; then
+																	      									.encodeparam $value
+																										else 
+																											.encodeparam $inject
+																										fi
+																										
 																									else
 																										eparam=(`echo "$inject" | sed 's;/;\\\/;g'`)
 																									fi
-																									.db "$line" "$f"
+																									.db "$line" "$f" 
                     	        		                		            		done
        									            						elif [ ! -z $payload ]; then
                     	        		                		        		declare -a arr4
@@ -379,12 +496,16 @@ elif [ -z $prm ]; then
 																							inj="${arr4[$r]}"						
 																							eparam="$inj"
 													    		 		            		if [[ $ans = "y" ]]; then
-																	      						.encodeparam "$inj"																		
+																	      						if [[ $en = "bd" ]]; then
+																	      							.encodeparam $value
+																								else 
+																									.encodeparam $inj
+																								fi																		
 
 																							else
 																								eparam=(`echo "$inj" | sed 's;/;\\\/;g'`)
 																							fi
-																							.db "$line" "$f"
+																							.db "$line" "$f" 
                     	        		                		            		done
     						    		            						fi 
 
