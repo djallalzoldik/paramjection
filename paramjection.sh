@@ -22,6 +22,9 @@ bg_magenta=`tput setab 5`
 # whitelist array for -k argument
 declare -a arrfiles=("ssrf" "idor" "redirect" "rce" "lfi" "xss" "isql")
 
+#date
+dated=$( date +"%m%d%Y%H%M%s")
+
 # function for urlencode 
 urlencode() {
     # urlencode <string>
@@ -186,20 +189,20 @@ verbose() {
 				#if [ "$stand" == "on" ]; then
 					if [ -z "$3" ]; then
 
-						echo "$1" | sed "s/$pa=[^&]*/$pa=$eparam/g" >> ~/"paramjection/db/""$2""-result.txt"
+						echo "$1" | sed "s/$pa=[^&]*/$pa=$eparam/g" >> ~/"paramjection/db/""$2_$dated""-result.txt"
 						if [ -t 1 ]; then
 							echo "[ $white $file $green$reset ]$1" | sed "s/$pa=[^&]*/$pa=$bg_magenta$eparam$reset/g"
 						else	
-							echo "$1" | sed "s/$pa=[^&]*/$pa=$eparam/g" #>> "db/""$2""-result.txt"
+							echo "$1" | sed "s/$pa=[^&]*/$pa=$eparam/g" #>> "db/""$2_$dated""-result.txt"
 						fi
 
 
 					else
-						echo "$1" | sed "s/$pa=[^&]*/$pa=$eparam/g" >> ~/"paramjection/db/""$2""-result.txt"
+						echo "$1" | sed "s/$pa=[^&]*/$pa=$eparam/g" >> ~/"paramjection/db/""$2_$dated""-result.txt"
 						if [ -t 1 ]; then
 							echo "[ $white $file $green$reset ]$1" | sed "s/$pa=[^&]*/$pa=$bg_magenta$eparam$reset/g"
 						else	
-							echo "$1" | sed "s/$pa=[^&]*/$pa=$eparam/g" #>> "db/""$2""-result.txt"
+							echo "$1" | sed "s/$pa=[^&]*/$pa=$eparam/g" #>> "db/""$2_$dated""-result.txt"
 						fi
 					fi
 
@@ -225,8 +228,8 @@ fi
 	if [[ -f ~/"paramjection/temp" ]]; then
 		rm ~/"paramjection/temp" 
 	fi  
-	if [[ -f ~/"paramjection/db""/$file""-result.txt" ]]; then
-	  rm ~/"paramjection/db"/"$file""-result.txt"
+	if [[ -f ~/"paramjection/db""/$file_$dated""-result.txt" ]]; then
+	  rm ~/"paramjection/db"/"$file_$dated""-result.txt"
 	fi
 
 #this for -f find params
@@ -258,12 +261,10 @@ if [ ! -z $prm ]; then
 						value=(`echo "$line" | sed "s/$pa=[^&]*/$cond/g" | sed "s/.*$pa=//g" | sed "s/&.*//g"`)
 						if [ -z "$can" ]; then 
 																				
-									#cond="&"
-									#value=(`echo "$line" | sed "s/'$pa'=[^&]*/'$cond'/g" | sed "s/.*'$pa'=//g" | sed "s/&.*//g"`)
+									
 
 									if [[ $ans = "y" ]]; then
-										if [[ $en = "bd" ]] || [[ $en = "d" ]]; then
-												echo $value
+										if [[ $en = "bd" ]] || [[ $en = "d" ]]; then											
 													.encodeparam "$value"
 											else 
 
@@ -304,23 +305,20 @@ if [ ! -z $prm ]; then
 
 			}
 								files=${list--} # POSIX-compliant; ${1:--} can be used either.
-								while IFS= read -r line; do
-								 echo $line
-								
-						
-								
-								  
+								while IFS= read -r line; do 
 								  findfunction
-								  prm="all" 
+								  if [[ $prm = "all" ]]; then
+								  	prm="all" 
+								  fi
 
 								  
 								  
 								done < <(cat -- "$files")
 
-			if [[ -f ~/"paramjection/db"/$file"-result.txt" ]]; then
-	  			cat ~/"paramjection/db/"$file"-result.txt" | sort -u > $file".txt"
-				echo $bg_green$black"successfully completed here your list >> $file.txt "$reset
-				rm ~/"paramjection/db/"$file"-result.txt" 
+			if [[ -f ~/"paramjection/db/""$file""_""$dated""-result.txt" ]]; then
+	  			cat ~/"paramjection/db/""$file"_"$dated""-result.txt" | sort -u > "$file""_$dated"".txt"
+				echo $bg_green$black"successfully completed here your list >>" "$file""_""$dated.txt "$reset
+				rm ~/"paramjection/db/""$file""_""$dated""-result.txt" 
 			else
 			   echo "THIS PARAM NOT FOUND  = $file"
 			fi
@@ -340,8 +338,8 @@ elif [ -z $prm ]; then
 				if [[ $file == "all" ]]; then
 		    		x="all"
 	        		file=$d						
-					if [[ -f ~/"paramjection/db/""$d""-result.txt" ]]; then
-	  					rm ~/"paramjection/db/""$d""-result.txt"
+					if [[ -f ~/"paramjection/db/""$d""_""$dated""-result.txt" ]]; then
+	  					rm ~/"paramjection/db/""$d""_""$dated""-result.txt"
 					fi
 			
 	    		fi
@@ -532,31 +530,31 @@ elif [ -z $prm ]; then
 							#function get stored data from db file and make some handling
 							function .catfiles () {
 							
-								if [[ -f ~/"paramjection/db"/"$f""-result.txt" ]]; then
-									cat ~/"paramjection/db"/"$f""-result.txt" | sort -u
-	  								rm ~/"paramjection/db"/"$f""-result.txt"
+								if [[ -f ~/"paramjection/db/""$f""_""$dated""-result.txt" ]]; then
+									cat ~/"paramjection/db/""$f""_""$dated""-result.txt" | sort -u
+	  								rm ~/"paramjection/db/""$f""_""$dated""-result.txt"
 								fi
   			    			} 
 
 							# if -k = "all" and the user choose -o argument
 							if [ ! -z $output ] && [[ $x = "all" ]]; then					
 								.catfiles  >> ~/"paramjection/temp"					
-								cat ~/"paramjection/temp" | sort -u > $output
+								cat ~/"paramjection/temp" | sort -u > "$output""_""$dated"
 
 							# if -k all and there are NO output from the user 
 			    			elif [ -z $output ] && [[ $x = "all" ]]; then
 						  		.catfiles  >> ~/"paramjection/temp"
-						  		cat ~/"paramjection/temp" | sort -u > $x".txt"
+						  		cat ~/"paramjection/temp" | sort -u > "$x""_""$dated.txt"
 
 							# if -k not "all" and there are some output from the user 
 			    			elif [ ! -z $output ] && [[ ! $x = "all" ]]; then
-				    	  		.catfiles  > $output
-						  		echo $bg_green$black"successfully completed here your list >> $output "$reset
+				    	  		.catfiles  > "$output""_""$dated"
+						  		echo $bg_green$black"successfully completed here your list >> ""$output""_""$dated"$reset
 
 							# if no one from preveiws condition then do this command
 							else
-				   				.catfiles > $f"-res.txt"				  
-				   				echo $bg_green$black"successfully completed here your list >> $f-res.txt"$reset
+				   				.catfiles > "$f""_""$dated""-res.txt"				  
+				   				echo $bg_green$black"successfully completed here your list >> $f_$dated-res.txt"$reset
 							fi
 					
 				fi
@@ -571,10 +569,10 @@ fi
 				if [[ $skip = "true" ]]; then
 				   echo "You logout "
 				elif [ ! -z $output ] && [[ $x = "all" ]]; then
-					echo $bg_green$black"successfully completed here your list >> $output "$reset
+					echo $bg_green$black"successfully completed here your list >> ""$output""_""$dated "$reset
 
 			    elif [ -z $output ] && [[ $x = "all" ]]; then
-					echo $bg_green$black"successfully completed here your list >> $x.txt"$reset
+					echo $bg_green$black"successfully completed here your list >> ""$x""_""$dated.txt"$reset
 				fi
 
 	
