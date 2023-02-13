@@ -39,22 +39,33 @@ There are 7 Options comes with -k argument wich are [ssrf,redirect,xss,idoor,isq
 
 + Analyze the list and try to find ssrf pramters , you can use -c argument to add your collabrator
 ```
-./paramjection.sh -k ssrf -c xxxxxxxxxxxxxxxxxxxxxxxxxxx.oast.site
+./paramjection.sh -k ssrf -c xxxxxxxxxxxxxxxxxxxxxxxxxxx.oast.site -l urls.txt
 ```
+####OR with STDIN
+```
+cat urls | ./paramjection.sh -k ssrf -c xxxxxxxxxxxxxxxxxxxxxxxxxxx.oast.site 
 
+```
 Analyze the list and try to find xss pramters , you can use -w argument to add your word
 ```
-./paramjection.sh -k xss -w hello
+./paramjection.sh -k xss -w hello -l urls.txt
+
+```
+####OR with STDIN
+```
+cat urls | ./paramjection.sh -k xss -w hello 
+
 ```
 
 Analyze the list and try to find lfi pramters , you can use -p argument to add your payloads list
 ```
-./paramjection.sh -k lfi -p /home/kali/payloads.txt
-```
-If you have list and try to find all the kinds [ssrf rce xss ...etc ,] type this command
+./paramjection.sh -k lfi -p /home/kali/payloads.txt -l urls.txt
 
 ```
-./paramjection.sh -k all -c xxxxxxxxxxxxxxxxxxxxxxxxxxx.oast.site -w hello
+####OR with STDIN
+
+```
+cat urls.txt | ./paramjection.sh -k lfi -p /home/kali/payloads.txt
 
 ```
 ## Second way :
@@ -62,7 +73,25 @@ If you have list and try to find all the kinds [ssrf rce xss ...etc ,] type this
 some time you have list and try to find specific param and injected with specific word
 
 ```
-./paramjection.sh -f specificparam -w hello
+./paramjection.sh -f "specificparam" -w hello
+
+```
+####OR with STDIN
+
+```
+cat urls.txt | ./paramjection.sh -f "specificparam" -w hello
+
+```
+## To inject all paramters
+
+```
+./paramjection.sh -f "all" -w hello
+
+```
+####OR with STDIN
+
+```
+cat urls.txt | ./paramjection.sh -f "all" -w hello
 
 ```
 
